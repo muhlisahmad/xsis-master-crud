@@ -15,7 +15,7 @@ public interface VariantRepository extends JpaRepository<Variant, Long> {
   @Query(
     value = """
       insert into master.variants (
-        name, slug, product_id, description, price, stock, created_at, updated_at
+        name, slug, product_id, description, price, stock, created_at
       ) 
       values (?1, ?2, (
         select id from master.products as p 

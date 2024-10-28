@@ -14,13 +14,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
   @Modifying
   @Query(
     value = """
-      insert into master.products (name, slug, category_id, created_at, updated_at) 
+      insert into master.products (name, slug, category_id, created_at) 
       values (?1, ?2, (
         select id from master.categories as c 
         where c.slug = ?3
         and c.deleted_at is null
         ),
-        now(), now()
+        now()
       )
     """,
     nativeQuery = true

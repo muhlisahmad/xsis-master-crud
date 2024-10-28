@@ -15,7 +15,7 @@ import com.xsis.master.crud.xsis_master_crud.dtos.responses.WebResponse;
 import com.xsis.master.crud.xsis_master_crud.services.ProductService;
 
 @RestController
-@RequestMapping("/api/1.0/product")
+@RequestMapping("/api/v1/product")
 public class ProductController {
   @Autowired
   private ProductService productService;

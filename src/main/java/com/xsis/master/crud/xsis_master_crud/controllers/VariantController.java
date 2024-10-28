@@ -15,7 +15,7 @@ import com.xsis.master.crud.xsis_master_crud.dtos.responses.WebResponse;
 import com.xsis.master.crud.xsis_master_crud.services.VariantService;
 
 @RestController
-@RequestMapping("/api/1.0/variant")
+@RequestMapping("/api/v1/variant")
 public class VariantController {
   @Autowired
   private VariantService variantService;

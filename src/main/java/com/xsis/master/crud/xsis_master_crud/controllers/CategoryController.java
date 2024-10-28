@@ -15,7 +15,7 @@ import com.xsis.master.crud.xsis_master_crud.dtos.responses.WebResponse;
 import com.xsis.master.crud.xsis_master_crud.services.CategoryService;
 
 @RestController
-@RequestMapping("/api/1.0/category")
+@RequestMapping("/api/v1/category")
 public class CategoryController {
   @Autowired
   private CategoryService categoryService;
