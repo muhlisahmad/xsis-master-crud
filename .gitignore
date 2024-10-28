@@ -35,3 +35,4 @@ build/
 ### env variables ###
 .env*.local
 *local.properties
+*local.conf
