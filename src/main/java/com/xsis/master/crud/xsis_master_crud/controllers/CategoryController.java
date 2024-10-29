@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.CategoryResponseDto;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.WebResponse;
 import com.xsis.master.crud.xsis_master_crud.services.CategoryService;
+import com.xsis.master.crud.xsis_master_crud.validations.ValidSlug;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 
 @RestController
 @RequestMapping("/api/v1/category")
@@ -25,8 +29,12 @@ public class CategoryController {
     produces = {MediaType.APPLICATION_JSON_VALUE}
   )
   public WebResponse<List<CategoryResponseDto>> getAllCategory(
-      @RequestParam(defaultValue = "1") Integer page,
-      @RequestParam(defaultValue = "10") Integer limit
+      @RequestParam(defaultValue = "1")
+      @Positive(message = "page argument must be more than 0") 
+      Integer page,
+      @RequestParam(defaultValue = "10") 
+      @Positive(message = "limit argument must be more than 0") 
+      Integer limit
     ) {
       return categoryService.findAllCategories(page, limit);
   }
@@ -35,7 +43,7 @@ public class CategoryController {
     path = "/{slug}",
     produces = {MediaType.APPLICATION_JSON_VALUE}
   )
-  public WebResponse<CategoryResponseDto> getCategoryBySlug(@PathVariable("slug") String slug) {
+  public WebResponse<CategoryResponseDto> getCategoryBySlug(@PathVariable("slug") @ValidSlug @Valid String slug) {
     return categoryService.findCategoryBySlug(slug);
   }
 }

@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.VariantResponseDto;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.WebResponse;
 import com.xsis.master.crud.xsis_master_crud.services.VariantService;
+import com.xsis.master.crud.xsis_master_crud.validations.ValidSlug;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 
 @RestController
 @RequestMapping("/api/v1/variant")
@@ -25,8 +29,12 @@ public class VariantController {
     produces = {MediaType.APPLICATION_JSON_VALUE}
   )
   public WebResponse<List<VariantResponseDto>> getAllVariants(
-    @RequestParam(defaultValue = "1") Integer page,
-    @RequestParam(defaultValue = "10") Integer limit
+      @RequestParam(defaultValue = "1")
+      @Positive(message = "page argument must be more than 0") 
+      Integer page,
+      @RequestParam(defaultValue = "10") 
+      @Positive(message = "limit argument must be more than 0") 
+      Integer limit
   ) {
     return variantService.findAllVariants(page, limit);
   }
@@ -35,7 +43,7 @@ public class VariantController {
     path = "/{slug}",
     produces = {MediaType.APPLICATION_JSON_VALUE}
   )
-  public WebResponse<VariantResponseDto> getVariantBySlug(@PathVariable("slug") String slug) {
+  public WebResponse<VariantResponseDto> getVariantBySlug(@PathVariable("slug") @ValidSlug @Valid String slug) {
     return variantService.findVariantBySlug(slug);
   }
 }
