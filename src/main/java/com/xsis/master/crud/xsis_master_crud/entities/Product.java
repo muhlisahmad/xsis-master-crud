@@ -37,6 +37,6 @@ public class Product extends AuditableEntity {
   @Column(length = 50, unique = true)
   private String slug;
 
-  @Column(length = 50, unique = true)
+  @Column(length = 75, unique = true)
   private String name;
 }

@@ -28,7 +28,7 @@ public class Category extends AuditableEntity {
   @Column(length = 50, unique = true)
   private String name;
   
-  @Column(length = 50, unique = true)
+  @Column(length = 75, unique = true)
   private String slug;
 
   @OneToMany(mappedBy = "category")

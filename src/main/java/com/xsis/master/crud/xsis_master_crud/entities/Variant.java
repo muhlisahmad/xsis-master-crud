@@ -31,7 +31,7 @@ public class Variant extends AuditableEntity {
   @Column(length = 150, unique = true)
   private String name;
 
-  @Column(length = 150, unique = true)
+  @Column(length = 175, unique = true)
   private String slug;
 
   @Column(columnDefinition = "TEXT")
