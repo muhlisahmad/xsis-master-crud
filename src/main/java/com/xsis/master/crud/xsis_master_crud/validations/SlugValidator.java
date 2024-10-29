@@ -18,7 +18,7 @@ public class SlugValidator implements ConstraintValidator<ValidSlug, String> {
     String slug = normalized.toLowerCase()
       .replace("&", "and")
       .replace("@", "at")
-      .replaceAll("[^a-z0-9\\s-]", "-")
+      .replaceAll("[^a-z0-9\\s-]", "")
       .replaceAll("\\s+", "-")
       .replaceAll("-{2,}", "-")
       .replaceAll("^-|-$", "");

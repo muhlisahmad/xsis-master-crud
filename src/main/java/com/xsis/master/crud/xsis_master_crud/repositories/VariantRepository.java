@@ -21,7 +21,7 @@ public interface VariantRepository extends JpaRepository<Variant, Long> {
         select id from master.products as p 
         where p.slug = ?3
         and p.deleted_at is null
-        ), ?4, ?5, ?6, now(), now()
+        ), ?4, ?5, ?6, now()
       )
     """,
     nativeQuery = true

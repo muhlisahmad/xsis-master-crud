@@ -148,7 +148,6 @@ public class ErrorController {
   @ExceptionHandler(ResponseStatusException.class)
   public ResponseEntity<ErrorResponse<String>> handleApiException(ResponseStatusException e) {
     log.error("An error occured: {}", e.getMessage(), e);
-    System.out.println("triggered");
 
     ErrorResponse<String> response = new ErrorResponse<String>(
       e.getStatusCode().value() < 500 ? "fail" : "error",
@@ -222,7 +221,7 @@ public class ErrorController {
     ErrorResponse<String> response = new ErrorResponse<String>(
       "fail", 
       "Data conflict", 
-      errorMessage
+      "Data already exists"
     );
 
     return new ResponseEntity<>(response, HttpStatus.CONFLICT);

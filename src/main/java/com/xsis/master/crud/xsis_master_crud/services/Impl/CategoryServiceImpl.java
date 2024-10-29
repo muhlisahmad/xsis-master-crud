@@ -9,13 +9,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.xsis.master.crud.xsis_master_crud.dtos.requests.CategoryRequestDto;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.CategoryResponseDto;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.Pagination;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.WebResponse;
 import com.xsis.master.crud.xsis_master_crud.repositories.CategoryRepository;
 import com.xsis.master.crud.xsis_master_crud.services.CategoryService;
+import com.xsis.master.crud.xsis_master_crud.utils.Slugify;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -52,5 +55,11 @@ public class CategoryServiceImpl implements CategoryService {
       (String) ((Object[]) categoryResult[0])[1]
     );
     return new WebResponse<>("success", "Category retrieved successfully", category);
+  }
+
+  @Override
+  @Transactional
+  public void createNewCategory(CategoryRequestDto category) {
+    categoryRepository.insertCategory(category.getName(), Slugify.toSlug(category.getName()));
   }
 }

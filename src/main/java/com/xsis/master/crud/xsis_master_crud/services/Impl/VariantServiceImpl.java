@@ -9,18 +9,25 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.xsis.master.crud.xsis_master_crud.dtos.requests.VariantRequestDto;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.Pagination;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.VariantResponseDto;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.WebResponse;
+import com.xsis.master.crud.xsis_master_crud.repositories.ProductRepository;
 import com.xsis.master.crud.xsis_master_crud.repositories.VariantRepository;
 import com.xsis.master.crud.xsis_master_crud.services.VariantService;
+import com.xsis.master.crud.xsis_master_crud.utils.Slugify;
 
 @Service
 public class VariantServiceImpl implements VariantService {
   @Autowired
   private VariantRepository variantRepository;
+
+  @Autowired
+  private ProductRepository productRepository;
 
   @Override
   public WebResponse<List<VariantResponseDto>> findAllVariants(Integer page, Integer limit) {
@@ -67,5 +74,23 @@ public class VariantServiceImpl implements VariantService {
     );
     return new WebResponse<VariantResponseDto>("success", "Variant retrieved successfully", variant);
   }
-}
 
+  @Override
+  @Transactional
+  public void createNewVariant(VariantRequestDto variant) {
+    Object[] product = productRepository.findBySlug(variant.getProduct());
+
+    if (product.length == 0) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No product with given name");
+    }
+
+    variantRepository.insertVariant(
+      variant.getName(), 
+      Slugify.toSlug(variant.getName()), 
+      variant.getProduct(), 
+      variant.getDescription(), 
+      variant.getPrice(), 
+      variant.getStock()
+    );
+  }
+}

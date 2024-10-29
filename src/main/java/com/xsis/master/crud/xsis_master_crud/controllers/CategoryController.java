@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.xsis.master.crud.xsis_master_crud.dtos.requests.CategoryRequestDto;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.CategoryResponseDto;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.WebResponse;
 import com.xsis.master.crud.xsis_master_crud.services.CategoryService;
@@ -17,6 +18,9 @@ import com.xsis.master.crud.xsis_master_crud.validations.ValidSlug;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @RestController
 @RequestMapping("/api/v1/category")
@@ -45,5 +49,15 @@ public class CategoryController {
   )
   public WebResponse<CategoryResponseDto> getCategoryBySlug(@PathVariable("slug") @ValidSlug @Valid String slug) {
     return categoryService.findCategoryBySlug(slug);
+  }
+
+  @PostMapping(
+    path = "",
+    consumes = {MediaType.APPLICATION_JSON_VALUE},
+    produces = {MediaType.APPLICATION_JSON_VALUE}
+  )
+  public WebResponse<String> createNewCategory(@RequestBody @Valid CategoryRequestDto categoryRequestBody) {
+    categoryService.createNewCategory(categoryRequestBody);
+    return new WebResponse<String>("success", "Category created successfully", null);
   }
 }

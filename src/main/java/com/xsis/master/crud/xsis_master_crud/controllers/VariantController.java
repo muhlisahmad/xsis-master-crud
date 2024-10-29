@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.xsis.master.crud.xsis_master_crud.dtos.requests.VariantRequestDto;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.VariantResponseDto;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.WebResponse;
 import com.xsis.master.crud.xsis_master_crud.services.VariantService;
@@ -17,6 +18,9 @@ import com.xsis.master.crud.xsis_master_crud.validations.ValidSlug;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @RestController
 @RequestMapping("/api/v1/variant")
@@ -45,6 +49,16 @@ public class VariantController {
   )
   public WebResponse<VariantResponseDto> getVariantBySlug(@PathVariable("slug") @ValidSlug @Valid String slug) {
     return variantService.findVariantBySlug(slug);
+  }
+
+  @PostMapping(
+    path = "",
+    consumes = {MediaType.APPLICATION_JSON_VALUE},
+    produces = {MediaType.APPLICATION_JSON_VALUE}
+  )
+  public WebResponse<String> createNewVariant(@RequestBody @Valid VariantRequestDto variantRequstBody) {
+    variantService.createNewVariant(variantRequstBody);
+    return new WebResponse<String>("success", "Variant created successfully", null);
   }
 }
 

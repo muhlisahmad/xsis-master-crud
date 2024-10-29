@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.xsis.master.crud.xsis_master_crud.dtos.requests.ProductRequestDto;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.ProductResponseDto;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.WebResponse;
 import com.xsis.master.crud.xsis_master_crud.services.ProductService;
@@ -17,6 +18,9 @@ import com.xsis.master.crud.xsis_master_crud.validations.ValidSlug;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @RestController
 @RequestMapping("/api/v1/product")
@@ -45,5 +49,15 @@ public class ProductController {
   )
   public WebResponse<ProductResponseDto> getProductBySlug(@PathVariable("slug") @ValidSlug @Valid String slug) {
     return productService.findProductBySlug(slug);
+  }
+
+  @PostMapping(
+    path = "",
+    consumes = {MediaType.APPLICATION_JSON_VALUE},
+    produces = {MediaType.APPLICATION_JSON_VALUE}
+  )
+  public WebResponse<String> postMethodName(@RequestBody @Valid ProductRequestDto productReqBody) {
+      productService.createNewProduct(productReqBody);
+      return new WebResponse<String>("success", "Product created successfully", null);
   }
 }
