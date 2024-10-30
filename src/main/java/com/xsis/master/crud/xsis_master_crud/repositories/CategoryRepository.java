@@ -49,7 +49,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
       update master.categories as c
       set 
         name = ?1,
-        slug = ?2
+        slug = ?2,
+        updated_at = now()
       where c.slug = ?3;
     """,
     nativeQuery = true
