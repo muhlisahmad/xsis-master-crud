@@ -10,5 +10,5 @@ public interface ProductService {
   WebResponse<List<ProductResponseDto>> findProducts(String product, Integer page, Integer limit);
   WebResponse<ProductResponseDto> findProductBySlug(String slug);
   void createNewProduct(ProductRequestDto product);
-  // WebResponse<List<ProductResponseDto>> findProductsByCategory(String product, Integer page, Integer limit);
+  void updateProductBySlug(ProductRequestDto product, String slug);
 }

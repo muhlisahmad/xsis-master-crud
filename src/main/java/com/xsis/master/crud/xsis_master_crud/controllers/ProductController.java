@@ -20,6 +20,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 
 @RestController
@@ -40,7 +42,6 @@ public class ProductController {
       @Positive(message = "limit argument must be more than 0") 
       Integer limit,
       @RequestParam(required = false)
-      @ValidSlug(message = "Invalid slug for category product")
       String category
   ) {
     return productService.findProducts(category, page, limit);
@@ -62,5 +63,18 @@ public class ProductController {
   public WebResponse<String> postMethodName(@RequestBody @Valid ProductRequestDto productReqBody) {
       productService.createNewProduct(productReqBody);
       return new WebResponse<String>("success", "Product created successfully", null);
+  }
+
+  @PutMapping(
+    path = "/{slug}",
+    consumes = {MediaType.APPLICATION_JSON_VALUE},
+    produces = {MediaType.APPLICATION_JSON_VALUE}
+  )
+  public WebResponse<String> updateProductBySlug(
+    @PathVariable("slug") @ValidSlug String slug, 
+    @RequestBody @Valid ProductRequestDto product
+  ) {
+    productService.updateProductBySlug(product, slug);
+    return new WebResponse<String>("success", "Product updated successfully", null);
   }
 }

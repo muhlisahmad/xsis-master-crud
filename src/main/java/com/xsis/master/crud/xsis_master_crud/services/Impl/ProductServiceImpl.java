@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.xsis.master.crud.xsis_master_crud.dtos.requests.ProductRequestDto;
@@ -22,6 +23,7 @@ import com.xsis.master.crud.xsis_master_crud.services.ProductService;
 import com.xsis.master.crud.xsis_master_crud.utils.Slugify;
 
 @Service
+@Validated
 public class ProductServiceImpl implements ProductService{
 
   @Autowired
@@ -76,5 +78,25 @@ public class ProductServiceImpl implements ProductService{
     }
     
     productRepository.insertProduct(product.getName(), Slugify.toSlug(product.getName()), product.getCategory());
+  }
+
+  @Override
+  @Transactional
+  public void updateProductBySlug(ProductRequestDto product, String slug) {
+    Object[] checkProduct = productRepository.findBySlug(slug);
+    Object[] checkCategory = categoryRepository.findBySlug(product.getCategory());
+
+    if (checkProduct.length == 0) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product with given name could not be found");
+    }
+
+    if (checkCategory.length == 0) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category with given name could not be found");
+    }
+
+    productRepository.updateProductBySlug(
+      product.getName(), Slugify.toSlug(product.getName()), 
+      product.getCategory(), slug
+    );
   }
 }

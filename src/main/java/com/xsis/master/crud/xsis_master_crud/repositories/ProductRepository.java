@@ -73,4 +73,23 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     nativeQuery = true
   )
   Page<Object[]> findProductsByCategory(String product, Pageable paging);
+
+  @Modifying
+  @Query(
+    value = """
+      update master.products as p
+      set
+        name = ?1,
+        slug = ?2,
+        category_id = (
+          select id from master.categories as c 
+          where c.slug = ?3
+          and c.deleted_at is null
+        ),
+        updated_at = now()
+      where p.slug = ?4
+    """,
+    nativeQuery = true
+  )
+  void updateProductBySlug(String name, String slug, String category, String slugForQuery);
 }
