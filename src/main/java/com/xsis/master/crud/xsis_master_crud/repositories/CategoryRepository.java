@@ -42,4 +42,17 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     nativeQuery = true
     )
   Object[] findBySlug(String slug);
+
+  @Modifying
+  @Query(
+    value = """
+      update master.categories as c
+      set 
+        name = ?1,
+        slug = ?2
+      where c.slug = ?3;
+    """,
+    nativeQuery = true
+  )
+  void updateCategoryBySlug(String name, String slug, String slugForQuery);
 }

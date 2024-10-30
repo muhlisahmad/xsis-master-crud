@@ -20,6 +20,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 
 @RestController
@@ -47,7 +49,7 @@ public class CategoryController {
     path = "/{slug}",
     produces = {MediaType.APPLICATION_JSON_VALUE}
   )
-  public WebResponse<CategoryResponseDto> getCategoryBySlug(@PathVariable("slug") @ValidSlug @Valid String slug) {
+  public WebResponse<CategoryResponseDto> getCategoryBySlug(@PathVariable("slug") @ValidSlug String slug) {
     return categoryService.findCategoryBySlug(slug);
   }
 
@@ -59,5 +61,22 @@ public class CategoryController {
   public WebResponse<String> createNewCategory(@RequestBody @Valid CategoryRequestDto categoryRequestBody) {
     categoryService.createNewCategory(categoryRequestBody);
     return new WebResponse<String>("success", "Category created successfully", null);
+  }
+
+  @PutMapping(
+    path = "/{slug}",
+    consumes = {MediaType.APPLICATION_JSON_VALUE},
+    produces = {MediaType.APPLICATION_JSON_VALUE}
+  )
+  public WebResponse<String> updateCategoryBySlug(
+    @PathVariable("slug") 
+    @ValidSlug String 
+    slug, 
+    @RequestBody 
+    @Valid CategoryRequestDto 
+    categoryReqBody
+  ) {
+    categoryService.updateCategoryBySlug(categoryReqBody, slug);
+    return new WebResponse<String>("success", "Category updated successfully", null);
   }
 }

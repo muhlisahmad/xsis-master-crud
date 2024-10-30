@@ -62,4 +62,10 @@ public class CategoryServiceImpl implements CategoryService {
   public void createNewCategory(CategoryRequestDto category) {
     categoryRepository.insertCategory(category.getName(), Slugify.toSlug(category.getName()));
   }
+
+  @Override
+  @Transactional
+  public void updateCategoryBySlug(CategoryRequestDto category, String slug) {
+    categoryRepository.updateCategoryBySlug(category.getName(), Slugify.toSlug(category.getName()), slug);
+  }
 }

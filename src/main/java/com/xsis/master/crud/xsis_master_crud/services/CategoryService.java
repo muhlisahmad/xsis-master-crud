@@ -10,4 +10,5 @@ public interface CategoryService {
   WebResponse<List<CategoryResponseDto>> findAllCategories(Integer page, Integer limit);
   WebResponse<CategoryResponseDto> findCategoryBySlug(String slug);
   void createNewCategory(CategoryRequestDto category);
+  void updateCategoryBySlug(CategoryRequestDto category, String slug);
 }
