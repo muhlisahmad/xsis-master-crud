@@ -66,6 +66,12 @@ public class CategoryServiceImpl implements CategoryService {
   @Override
   @Transactional
   public void updateCategoryBySlug(CategoryRequestDto category, String slug) {
+    Object[] checkCategory = categoryRepository.findBySlug(slug);
+    
+    if (checkCategory.length == 0) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category with given name could not be found");
+    }
+
     categoryRepository.updateCategoryBySlug(category.getName(), Slugify.toSlug(category.getName()), slug);
   }
 }
