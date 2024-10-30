@@ -30,9 +30,11 @@ public class VariantServiceImpl implements VariantService {
   private ProductRepository productRepository;
 
   @Override
-  public WebResponse<List<VariantResponseDto>> findAllVariants(Integer page, Integer limit) {
+  public WebResponse<List<VariantResponseDto>> findAllVariants(String product, Integer page, Integer limit) {
     Pageable paging = PageRequest.of(page - 1, limit, Sort.by(Sort.Order.asc("name")));
-    Page<Object[]> variantsResult = variantRepository.findAllVariants(paging);
+    Page<Object[]> variantsResult = product == null 
+      ? variantRepository.findAllVariants(paging)
+      : variantRepository.findVariantsByProduct(product, paging);
 
     if (variantsResult.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Variants not found");

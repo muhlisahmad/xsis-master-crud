@@ -57,4 +57,20 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     nativeQuery = true
   )
   Object[] findBySlug(String slug);
+
+  @Query(
+    value = """
+      select
+        p.name,
+        p.slug,
+        c.name as category
+      from master.products as p
+      join master.categories as c
+      on p.category_id = c.id
+      where p.deleted_at is null
+      and c.slug = ?1
+    """,
+    nativeQuery = true
+  )
+  Page<Object[]> findProductsByCategory(String product, Pageable paging);
 }

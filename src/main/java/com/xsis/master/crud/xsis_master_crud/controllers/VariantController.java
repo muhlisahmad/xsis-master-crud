@@ -38,9 +38,12 @@ public class VariantController {
       Integer page,
       @RequestParam(defaultValue = "10") 
       @Positive(message = "limit argument must be more than 0") 
-      Integer limit
+      Integer limit,
+      @RequestParam(required = false)
+      @ValidSlug(message = "Invalid slug for product variant")
+      String product
   ) {
-    return variantService.findAllVariants(page, limit);
+    return variantService.findAllVariants(product, page, limit);
   }
   
   @GetMapping(

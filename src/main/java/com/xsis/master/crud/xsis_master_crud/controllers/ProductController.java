@@ -38,9 +38,12 @@ public class ProductController {
       Integer page,
       @RequestParam(defaultValue = "10") 
       @Positive(message = "limit argument must be more than 0") 
-      Integer limit
+      Integer limit,
+      @RequestParam(required = false)
+      @ValidSlug(message = "Invalid slug for category product")
+      String category
   ) {
-    return productService.findAllProducts(page, limit);
+    return productService.findProducts(category, page, limit);
   }
 
   @GetMapping(

@@ -31,9 +31,11 @@ public class ProductServiceImpl implements ProductService{
   private CategoryRepository categoryRepository;
 
   @Override
-  public WebResponse<List<ProductResponseDto>> findAllProducts(Integer page, Integer limit) {
+  public WebResponse<List<ProductResponseDto>> findProducts(String category, Integer page, Integer limit) {
     Pageable paging = PageRequest.of(page - 1, limit, Sort.by(Sort.Order.asc("name")));
-    Page<Object[]> productsResult = productRepository.findAllProducts(paging);
+    Page<Object[]> productsResult = category == null
+      ? productRepository.findAllProducts(paging)
+      : productRepository.findProductsByCategory(category, paging);
 
     if (productsResult.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Products not found");
