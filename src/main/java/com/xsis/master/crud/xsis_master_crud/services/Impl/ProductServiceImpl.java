@@ -10,7 +10,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.xsis.master.crud.xsis_master_crud.dtos.requests.ProductRequestDto;
@@ -22,9 +21,12 @@ import com.xsis.master.crud.xsis_master_crud.repositories.ProductRepository;
 import com.xsis.master.crud.xsis_master_crud.services.ProductService;
 import com.xsis.master.crud.xsis_master_crud.utils.Slugify;
 
+import jakarta.validation.Validator;
+
 @Service
-@Validated
 public class ProductServiceImpl implements ProductService{
+  @Autowired
+  private Validator validator;
 
   @Autowired
   private ProductRepository productRepository;
@@ -37,7 +39,7 @@ public class ProductServiceImpl implements ProductService{
     Pageable paging = PageRequest.of(page - 1, limit, Sort.by(Sort.Order.asc("name")));
     Page<Object[]> productsResult = category == null
       ? productRepository.findAllProducts(paging)
-      : productRepository.findProductsByCategory(category, paging);
+      : productRepository.findProductsByCategory(Slugify.validateSlug(category, validator), paging);
 
     if (productsResult.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Products not found");
