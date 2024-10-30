@@ -21,8 +21,13 @@ import com.xsis.master.crud.xsis_master_crud.repositories.VariantRepository;
 import com.xsis.master.crud.xsis_master_crud.services.VariantService;
 import com.xsis.master.crud.xsis_master_crud.utils.Slugify;
 
+import jakarta.validation.Validator;
+
 @Service
 public class VariantServiceImpl implements VariantService {
+  @Autowired
+  private Validator validator;
+
   @Autowired
   private VariantRepository variantRepository;
 
@@ -34,7 +39,7 @@ public class VariantServiceImpl implements VariantService {
     Pageable paging = PageRequest.of(page - 1, limit, Sort.by(Sort.Order.asc("name")));
     Page<Object[]> variantsResult = product == null 
       ? variantRepository.findAllVariants(paging)
-      : variantRepository.findVariantsByProduct(product, paging);
+      : variantRepository.findVariantsByProduct(Slugify.validateSlug(product, validator), paging);
 
     if (variantsResult.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Variants not found");
@@ -93,6 +98,27 @@ public class VariantServiceImpl implements VariantService {
       variant.getDescription(), 
       variant.getPrice(), 
       variant.getStock()
+    );
+  }
+
+  @Override
+  @Transactional
+  public void updateVariantBySlug(VariantRequestDto variant, String slug) {
+    Object[] checkVariant = variantRepository.findBySlug(slug);
+    Object[] checkProduct = productRepository.findBySlug(variant.getProduct());
+
+    if (checkVariant.length == 0) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Variant with given name could not be found");
+    }
+
+    if (checkProduct.length == 0) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product with given name could not be found");
+    }
+
+    variantRepository.updateVariantBySlug(
+      variant.getName(), Slugify.toSlug(variant.getName()), 
+      variant.getProduct(), variant.getDescription(), 
+      variant.getPrice(), variant.getStock(), slug
     );
   }
 }

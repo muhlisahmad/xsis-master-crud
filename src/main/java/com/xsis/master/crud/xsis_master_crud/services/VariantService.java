@@ -10,4 +10,5 @@ public interface VariantService {
   WebResponse<List<VariantResponseDto>> findAllVariants(String product, Integer page, Integer limit);
   WebResponse<VariantResponseDto> findVariantBySlug(String slug);
   void createNewVariant(VariantRequestDto variant);
+  void updateVariantBySlug(VariantRequestDto variant, String slug);
 }

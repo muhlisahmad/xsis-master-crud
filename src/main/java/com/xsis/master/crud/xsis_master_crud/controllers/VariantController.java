@@ -20,7 +20,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api/v1/variant")
@@ -40,7 +40,6 @@ public class VariantController {
       @Positive(message = "limit argument must be more than 0") 
       Integer limit,
       @RequestParam(required = false)
-      @ValidSlug(message = "Invalid slug for product variant")
       String product
   ) {
     return variantService.findAllVariants(product, page, limit);
@@ -62,6 +61,19 @@ public class VariantController {
   public WebResponse<String> createNewVariant(@RequestBody @Valid VariantRequestDto variantRequstBody) {
     variantService.createNewVariant(variantRequstBody);
     return new WebResponse<String>("success", "Variant created successfully", null);
+  }
+
+  @PutMapping(
+    name = "/{slug}",
+    consumes = {MediaType.APPLICATION_JSON_VALUE},
+    produces = {MediaType.APPLICATION_JSON_VALUE}
+  )
+  public WebResponse<String> updateVariantBySlug(
+    @PathVariable("slug") @ValidSlug String slug, 
+    @RequestBody @Valid VariantRequestDto variantReqBody
+  ) {
+    variantService.updateVariantBySlug(variantReqBody, slug);
+    return new WebResponse<String>("success", "Variant updated successfully", null);
   }
 }
 
