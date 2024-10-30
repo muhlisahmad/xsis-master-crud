@@ -34,7 +34,7 @@ public class CategoryController {
     path = "",
     produces = {MediaType.APPLICATION_JSON_VALUE}
   )
-  public WebResponse<List<CategoryResponseDto>> getAllCategory(
+  public WebResponse<List<CategoryResponseDto>> getCategories(
       @RequestParam(defaultValue = "1")
       @Positive(message = "page argument must be more than 0") 
       Integer page,
@@ -42,7 +42,7 @@ public class CategoryController {
       @Positive(message = "limit argument must be more than 0") 
       Integer limit
     ) {
-      return categoryService.findAllCategories(page, limit);
+      return categoryService.findCategories(page, limit);
   }
   
   @GetMapping(

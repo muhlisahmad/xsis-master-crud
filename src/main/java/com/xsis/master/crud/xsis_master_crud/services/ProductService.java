@@ -11,4 +11,5 @@ public interface ProductService {
   WebResponse<ProductResponseDto> findProductBySlug(String slug);
   void createNewProduct(ProductRequestDto product);
   void updateProductBySlug(ProductRequestDto product, String slug);
+  void deleteProductBySlug(String slug);
 }

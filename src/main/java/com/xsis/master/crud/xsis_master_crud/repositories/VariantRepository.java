@@ -87,6 +87,28 @@ public interface VariantRepository extends JpaRepository<Variant, Long> {
       join master.categories as c
       on p.category_id = c.id
       where v.deleted_at is null
+      and c.slug = ?1
+    """,
+    nativeQuery = true
+  )
+  Page<Object[]> findVariantsByCategory(String category, Pageable paging);
+
+  @Query(
+    value = """
+      select
+        v.name,
+        v.slug,
+        p.name as product,
+        c.name as category,
+        v.description,
+        v.stock,
+        v.price
+      from master.variants as v
+      join master.products as p
+      on v.product_id = p.id
+      join master.categories as c
+      on p.category_id = c.id
+      where v.deleted_at is null
       and v.slug = ?1
     """,
     nativeQuery = true
@@ -114,4 +136,15 @@ public interface VariantRepository extends JpaRepository<Variant, Long> {
     nativeQuery = true
   )
   void updateVariantBySlug(String name, String slug, String productSlug, String description, Long price, Long stock, String slugForQuery);
+
+  @Modifying
+  @Query(
+    value = """
+      update master.variants as v
+      set deleted_at = now()
+      where v.slug = ?1
+    """,
+    nativeQuery = true
+  )
+  void deleteVariantBySlug(String slug);
 }

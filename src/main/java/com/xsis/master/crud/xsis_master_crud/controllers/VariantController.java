@@ -3,12 +3,15 @@ package com.xsis.master.crud.xsis_master_crud.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.xsis.master.crud.xsis_master_crud.dtos.requests.VariantRequestDto;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.VariantResponseDto;
@@ -32,7 +35,7 @@ public class VariantController {
     path = "",
     produces = {MediaType.APPLICATION_JSON_VALUE}
   )
-  public WebResponse<List<VariantResponseDto>> getAllVariants(
+  public WebResponse<List<VariantResponseDto>> getVariants(
       @RequestParam(defaultValue = "1")
       @Positive(message = "page argument must be more than 0") 
       Integer page,
@@ -40,9 +43,17 @@ public class VariantController {
       @Positive(message = "limit argument must be more than 0") 
       Integer limit,
       @RequestParam(required = false)
-      String product
+      String product,
+      @RequestParam(required = false)
+      String category
   ) {
-    return variantService.findAllVariants(product, page, limit);
+    if (product != null && category != null) {
+      throw new ResponseStatusException(
+        HttpStatus.BAD_REQUEST, 
+        "Only product or category can be provided, but not both"
+      );
+    }
+    return variantService.findVariants(product, category, page, limit);
   }
   
   @GetMapping(
@@ -74,6 +85,16 @@ public class VariantController {
   ) {
     variantService.updateVariantBySlug(variantReqBody, slug);
     return new WebResponse<String>("success", "Variant updated successfully", null);
+  }
+
+  @DeleteMapping(
+    name = "/{slug}",
+    consumes = {MediaType.APPLICATION_JSON_VALUE},
+    produces = {MediaType.APPLICATION_JSON_VALUE}
+  )
+  public WebResponse<String> deleteVariantBySlug(@PathVariable("slug") @ValidSlug String slug) {
+    variantService.deleteVariantBySlug(slug);
+    return new WebResponse<String>("success", "Variant deleted successfully", null);
   }
 }
 

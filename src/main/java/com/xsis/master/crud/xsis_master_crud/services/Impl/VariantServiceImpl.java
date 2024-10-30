@@ -35,11 +35,17 @@ public class VariantServiceImpl implements VariantService {
   private ProductRepository productRepository;
 
   @Override
-  public WebResponse<List<VariantResponseDto>> findAllVariants(String product, Integer page, Integer limit) {
+  public WebResponse<List<VariantResponseDto>> findVariants(String product, String category, Integer page, Integer limit) {
     Pageable paging = PageRequest.of(page - 1, limit, Sort.by(Sort.Order.asc("name")));
-    Page<Object[]> variantsResult = product == null 
-      ? variantRepository.findAllVariants(paging)
-      : variantRepository.findVariantsByProduct(Slugify.validateSlug(product, validator), paging);
+    Page<Object[]> variantsResult = null;
+    
+    if (product != null) {
+      variantsResult = variantRepository.findVariantsByProduct(Slugify.validateSlug(product, validator), paging);
+    } else if (category != null) {
+      variantsResult = variantRepository.findVariantsByCategory(Slugify.validateSlug(category, validator), paging);
+    } else {
+      variantsResult = variantRepository.findAllVariants(paging);
+    }
 
     if (variantsResult.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Variants not found");
@@ -120,5 +126,17 @@ public class VariantServiceImpl implements VariantService {
       variant.getProduct(), variant.getDescription(), 
       variant.getPrice(), variant.getStock(), slug
     );
+  }
+
+  @Override
+  @Transactional
+  public void deleteVariantBySlug(String slug) {
+    Object[] checkVariant = variantRepository.findBySlug(slug);
+
+    if (checkVariant.length == 0) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No variant with given name");
+    }
+
+    variantRepository.deleteVariantBySlug(slug);
   }
 }

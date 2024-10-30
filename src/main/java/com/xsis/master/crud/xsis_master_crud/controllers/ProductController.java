@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +35,7 @@ public class ProductController {
     path = "",
     produces = {MediaType.APPLICATION_JSON_VALUE}
   )
-  public WebResponse<List<ProductResponseDto>> getAllProducts(
+  public WebResponse<List<ProductResponseDto>> getProducts(
       @RequestParam(defaultValue = "1")
       @Positive(message = "page argument must be more than 0") 
       Integer page,
@@ -76,5 +77,15 @@ public class ProductController {
   ) {
     productService.updateProductBySlug(product, slug);
     return new WebResponse<String>("success", "Product updated successfully", null);
+  }
+
+  @DeleteMapping(
+    path = "/{slug}",
+    consumes = {MediaType.APPLICATION_JSON_VALUE},
+    produces = {MediaType.APPLICATION_JSON_VALUE}
+  )
+  public WebResponse<String> deleteProductBySlug(@PathVariable("slug") @ValidSlug String slug) {
+    productService.deleteProductBySlug(slug);
+    return new WebResponse<String>("success", "Product deleted successfully", null);
   }
 }

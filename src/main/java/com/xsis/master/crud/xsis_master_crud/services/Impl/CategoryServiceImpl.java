@@ -17,6 +17,8 @@ import com.xsis.master.crud.xsis_master_crud.dtos.responses.CategoryResponseDto;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.Pagination;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.WebResponse;
 import com.xsis.master.crud.xsis_master_crud.repositories.CategoryRepository;
+import com.xsis.master.crud.xsis_master_crud.repositories.ProductRepository;
+import com.xsis.master.crud.xsis_master_crud.repositories.VariantRepository;
 import com.xsis.master.crud.xsis_master_crud.services.CategoryService;
 import com.xsis.master.crud.xsis_master_crud.utils.Slugify;
 
@@ -25,8 +27,14 @@ public class CategoryServiceImpl implements CategoryService {
   @Autowired
   private CategoryRepository categoryRepository;
 
+  @Autowired
+  private ProductRepository productRepository;
+
+  @Autowired
+  private VariantRepository variantRepository;
+
   @Override
-  public WebResponse<List<CategoryResponseDto>> findAllCategories(Integer page, Integer limit) {
+  public WebResponse<List<CategoryResponseDto>> findCategories(Integer page, Integer limit) {
     Pageable paging = PageRequest.of(page - 1, limit, Sort.by(Sort.Order.asc("name")));
     Page<Object[]> categoriesResult = categoryRepository.findAllCategories(paging);
 
@@ -73,5 +81,53 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     categoryRepository.updateCategoryBySlug(category.getName(), Slugify.toSlug(category.getName()), slug);
+  }
+
+  @Override
+  @Transactional
+  public void deleteCategoryBySlug(String slug) {
+    Object[] checkCategory = categoryRepository.findBySlug(slug);
+
+    if (checkCategory.length == 0) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No category with given name");
+    }
+    Integer productPage = 0;
+    Integer productTotalPage = 0;
+    Integer variantPage = 0;
+    Integer variantTotalPage = 0;
+
+    while (productPage != productTotalPage || (productPage == 0 && productTotalPage == 0)) {
+      Pageable paging = PageRequest.of(productPage, 10, Sort.by(Sort.Order.asc("name")));
+      Page<Object[]> productsCategory = productRepository.findProductsByCategory(slug, paging);
+
+      if (productsCategory.isEmpty()) {
+        break;
+      }
+      
+      productsCategory.stream().forEach(obj -> {
+        productRepository.deleteProductBySlug((String) obj[1]);
+      });
+      
+      productPage ++;
+      productTotalPage = productsCategory.getTotalPages();
+    }
+
+    while (variantPage != variantTotalPage || (variantPage == 0 && variantTotalPage == 0)) {
+      Pageable paging = PageRequest.of(variantPage, 10, Sort.by(Sort.Order.asc("name")));
+      Page<Object[]> variantsCategory = variantRepository.findVariantsByCategory(slug, paging);
+
+      if (variantsCategory.isEmpty()) {
+        break;
+      }
+      
+      variantsCategory.stream().forEach(obj -> {
+        variantRepository.deleteVariantBySlug((String) obj[1]);
+      });
+      
+      variantPage ++;
+      variantTotalPage = variantsCategory.getTotalPages();
+    }
+
+    categoryRepository.deleteCategoryBySlug(slug);
   }
 }

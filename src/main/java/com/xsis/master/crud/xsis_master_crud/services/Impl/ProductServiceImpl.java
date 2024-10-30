@@ -18,6 +18,7 @@ import com.xsis.master.crud.xsis_master_crud.dtos.responses.ProductResponseDto;
 import com.xsis.master.crud.xsis_master_crud.dtos.responses.WebResponse;
 import com.xsis.master.crud.xsis_master_crud.repositories.CategoryRepository;
 import com.xsis.master.crud.xsis_master_crud.repositories.ProductRepository;
+import com.xsis.master.crud.xsis_master_crud.repositories.VariantRepository;
 import com.xsis.master.crud.xsis_master_crud.services.ProductService;
 import com.xsis.master.crud.xsis_master_crud.utils.Slugify;
 
@@ -33,6 +34,9 @@ public class ProductServiceImpl implements ProductService{
 
   @Autowired
   private CategoryRepository categoryRepository;
+
+  @Autowired
+  private VariantRepository variantRepository;
 
   @Override
   public WebResponse<List<ProductResponseDto>> findProducts(String category, Integer page, Integer limit) {
@@ -100,5 +104,35 @@ public class ProductServiceImpl implements ProductService{
       product.getName(), Slugify.toSlug(product.getName()), 
       product.getCategory(), slug
     );
+  }
+
+  @Override
+  @Transactional
+  public void deleteProductBySlug(String slug) {
+    Object[] checkProduct = productRepository.findBySlug(slug);
+
+    if (checkProduct.length == 0) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product with given name could not be found");
+    }
+    Integer variantPage = 0;
+    Integer variantTotalPage = 0;
+
+    while (variantPage != variantTotalPage || (variantPage == 0 && variantTotalPage == 0)) {
+      Pageable paging = PageRequest.of(variantPage, 10, Sort.by(Sort.Order.asc("name")));
+      Page<Object[]> variantsProduct = variantRepository.findVariantsByProduct(slug, paging);
+
+      if (variantsProduct.isEmpty()) {
+        break;
+      }
+
+      variantsProduct.stream().forEach(obj -> {
+        variantRepository.deleteVariantBySlug((String) obj[1]);
+      });
+
+      variantPage++;
+      variantTotalPage = variantsProduct.getTotalPages();
+    }
+
+    productRepository.deleteProductBySlug(slug);
   }
 }

@@ -56,4 +56,15 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     nativeQuery = true
   )
   void updateCategoryBySlug(String name, String slug, String slugForQuery);
+
+  @Modifying
+  @Query(
+    value = """
+      update master.categories as c
+      set deleted_at = now()
+      where c.slug = ?1
+    """,
+    nativeQuery = true
+  )
+  void deleteCategoryBySlug(String slug);
 }

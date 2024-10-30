@@ -72,7 +72,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     """,
     nativeQuery = true
   )
-  Page<Object[]> findProductsByCategory(String product, Pageable paging);
+  Page<Object[]> findProductsByCategory(String category, Pageable paging);
 
   @Modifying
   @Query(
@@ -92,4 +92,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     nativeQuery = true
   )
   void updateProductBySlug(String name, String slug, String category, String slugForQuery);
+
+  @Modifying
+  @Query(
+    value = """
+      update master.products as p
+      set deleted_at = now()
+      where p.slug = ?1
+    """,
+    nativeQuery = true
+  )
+  void deleteProductBySlug(String slug);
 }
